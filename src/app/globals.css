@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f4f5;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/*
+ * 対面で相手を緊張させないよう、青と赤は Tailwind 既定より彩度を約2割落として明るくし、
+ * 青は空色寄り・赤はコーラル寄りに振った柔らかいトーンに置き換える（クラス名はそのまま使える）
+ */
+@theme {
+  --color-blue-50: oklch(97% 0.011 248.6);
+  --color-blue-100: oklch(93.2% 0.025 249.6);
+  --color-blue-200: oklch(88.2% 0.046 248.1);
+  --color-blue-300: oklch(82.4% 0.082 245.8);
+  --color-blue-400: oklch(73.7% 0.129 248.6);
+  --color-blue-500: oklch(65.8% 0.167 253.8);
+  --color-blue-600: oklch(58.1% 0.191 256.9);
+  --color-blue-700: oklch(51.8% 0.19 258.4);
+  --color-blue-800: oklch(44.4% 0.155 259.6);
+  --color-blue-900: oklch(38.9% 0.114 259.5);
+  --color-blue-950: oklch(28.2% 0.071 261.9);
+
+  --color-red-50: oklch(97.1% 0.01 23.4);
+  --color-red-100: oklch(93.6% 0.025 23.7);
+  --color-red-200: oklch(88.5% 0.048 24.3);
+  --color-red-300: oklch(82.3% 0.089 25.6);
+  --color-red-400: oklch(73.4% 0.149 28.2);
+  --color-red-500: oklch(67.2% 0.185 31.3);
+  --color-red-600: oklch(61.2% 0.191 33.3);
+  --color-red-700: oklch(53.5% 0.166 33.5);
+  --color-red-800: oklch(46.4% 0.138 32.9);
+  --color-red-900: oklch(40.6% 0.11 31.7);
+  --color-red-950: oklch(25.8% 0.072 32);
+
+  /* 白いカードを枠線なしで空間にふわっと浮かせる、ごく薄く広がる影（shadow-soft / shadow-soft-sm） */
+  --shadow-soft: 0 8px 30px rgb(0 0 0 / 0.06);
+  --shadow-soft-sm: 0 4px 16px rgb(0 0 0 / 0.05);
+
+  /* バネのように少し行き過ぎてから戻る（ease-spring） */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*
+ * 押せる物理ボタン。下辺の太い枠（色は border-b-* で面より一段暗い同系色を指定）が厚みになり、
+ * 押した瞬間に面がその厚みの分だけ沈み込む。transform で動かすのでレイアウトは揺れない
+ */
+@utility chunky {
+  border-bottom-width: 4px;
+  border-bottom-style: solid;
+  /* 面の色が下辺の枠に回り込まないようにし、沈んだときは枠を透明にして厚みを消す */
+  background-clip: padding-box;
+  transition-property: translate, background-color, border-color, color, opacity;
+  transition-duration: 120ms;
+  transition-timing-function: var(--ease-spring);
+
+  &:active:not(:disabled) {
+    /* -translate-x-1/2 などで中央寄せしているボタンでも、横位置は保ったまま沈める */
+    translate: var(--tw-translate-x, 0) 4px;
+    border-bottom-color: transparent;
+    transition-duration: 60ms;
+  }
+}
+
+html,
+body {
+  /* 画面は h-dvh に収めて内側だけをスクロールさせるので、ページ自体のバウンスや
+     引っ張って更新（ルームが切れる）を起こさない */
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+
+/* 状態が切り替わるときの入場アニメーション */
+@theme {
+  --animate-fade-in: fade-in 0.4s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop-in: pop-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  /* 録音中のランプ・マイク: ぽよんと弾んでから落ち着き、波紋が広がる */
+  --animate-breathe: breathe 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  --animate-live-ring: live-ring 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  /* 翻訳中のタイピングインジケーター: 3つのドットが順番に跳ね、着地でわずかにつぶれる */
+  --animate-typing: typing 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  --animate-typing-fade: typing-fade 1.4s ease-in-out infinite;
+  /* 相手が話している最中の波形: 縦棒が声の大きさのように不規則に伸び縮みする */
+  --animate-voice-bar: voice-bar 0.9s ease-in-out infinite;
+  /* 送信ボタンの紙飛行機: 右上へ飛び去り、左下から戻ってくる */
+  --animate-send-fly: send-fly 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes voice-bar {
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+    35% {
+      transform: scaleY(1);
+    }
+    65% {
+      transform: scaleY(0.55);
+    }
+  }
+
+  @keyframes send-fly {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+    35% {
+      opacity: 0;
+      transform: translate(18px, -18px) scale(0.8);
+    }
+    36% {
+      opacity: 0;
+      transform: translate(-14px, 14px) scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    20% {
+      opacity: 0.85;
+      transform: scale(1.22);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(0.94);
+    }
+    60% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes live-ring {
+    from {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.9);
+    }
+  }
+
+  @keyframes typing {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: translateY(0) scale(0.85);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-5px) scale(1);
+    }
+    55% {
+      opacity: 0.6;
+      transform: translateY(0) scale(1.08, 0.8);
+    }
+    70% {
+      opacity: 0.45;
+      transform: translateY(0) scale(0.85);
+    }
+  }
+
+  @keyframes typing-fade {
+    0%,
+    60%,
+    100% {
+      opacity: 0.35;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-pop-in,
+  .animate-breathe,
+  .animate-live-ring,
+  .animate-typing,
+  .animate-voice-bar,
+  .animate-send-fly {
+    animation: none;
+  }
+}
